@@ -11,6 +11,7 @@ GIT_NAME=sammy
 GIT_EMAIL=lisemi@163.com
 GIT_KEY=$USER_PATH/.ssh/id_rsa.pub
 NFS_PATH=$USER_PATH/nfs
+TFTP_PATH=$USER_PATH/tftpboot
 
 echo -e "\e[0;33;1m     exit| install | config\e[0m"
 echo -e "\e[0;33;1m     select toolkit name, default compile all\e[0m"
@@ -20,7 +21,7 @@ echo -e "\e[0;33;1m       git | lzop | help2man  | odblatex  | autoconf  | pytho
 echo -e "\e[0;33;1m       m4  | zsh  | indent    | docbook2x | mtd-utils | openssh-server\e[0m"
 echo -e "\e[0;33;1m       bc  | vim  | autopoint | bison     | md5sum    | indicator-netspeed\e[0m"
 echo -e "\e[0;33;1m       nfs | scons| samba     | cmake     | compizconfig-settings-manager\e[0m"
-echo -e "\e[0;33;1m       dbus|      | d-feet    | libgtk2.0 | libncurses5-dev\e[0m"
+echo -e "\e[0;33;1m       dbus| tftp | d-feet    | libgtk2.0 | libncurses5-dev\e[0m"
 echo -e "\e[0;32;1m   choose:\e[0m \c"
 read compile_args
 
@@ -59,6 +60,7 @@ package_name=(
 [31]=libncurses5-dev
 [32]=scons
 [33]="nfs-kernel-server nfs-common"
+[34]="tftpd-hpa tftp-hpa"
 )
 
 trap - INT
@@ -98,6 +100,7 @@ case $compile_args in
 	libncurses5-dev)            toolkit_index=31;;
 	scons)                      toolkit_index=32;;
 	nfs)                        toolkit_index=33;;
+	tftp)                       toolkit_index=34;;
 	config)					    toolkit_index=1000;;
 	exit)                       exit 0;;
 	*)                          echo -e "\e[0;32;1m[info] : invalid arguments\e[0m"; exit 0;;
@@ -131,6 +134,10 @@ fi
 	# exit 0
 # fi
 
+function is_run(){
+	ps -ef | grep "$1" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程
+}
+
 function config_zsh(){
 	echo -e "\033[0;32;1m[info] : detection zsh\e[0m"
 	if [ ! -f $HOME/.zshrc ]; then
@@ -154,6 +161,18 @@ function config_samba(){
 		sudo sed -i '$a writable = yes' /etc/samba/smb.conf
 		sudo sed -i '$a create mask = 0775' /etc/samba/smb.conf
 		sudo sed -i '$a directory mask = 0775' /etc/samba/smb.conf
+	else
+		echo -e "\033[0;32;1m[info] : The $USER_PATH has been configured into /etc/samba/smb.conf\e[0m"
+	fi
+	ps -ef | grep "smbd" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程
+	if [ $? = "0" ];then
+		echo -e "\033[0;32;1m[info] : restart samba!\e[0m"
+		sudo /etc/init.d/samba reload
+		sudo /etc/init.d/samba restart
+	else
+		echo -e "\033[0;32;1m[info] : start samba!\e[0m"
+		sudo /etc/init.d/samba reload
+		sudo /etc/init.d/samba start
 	fi
 }
 
@@ -209,6 +228,41 @@ function config_nfs(){
 	fi
 }
 
+function config_tftp(){
+	echo -e "\033[0;32;1m[info] : configure tftp\e[0m"
+	if [ ! -d $TFTP_PATH ]; then
+		echo -e "\033[0;32;1m[info] : create $TFTP_PATH\e[0m"
+		mkdir $TFTP_PATH
+		sudo chmod –R 777 $TFTP_PATH
+	fi
+
+	if [ -f /etc/default/tftpd-hpa ]; then
+		if [ ! -f /etc/default/tftpd-hpa_bak ]; then
+			sudo cp /etc/default/tftpd-hpa /etc/default/tftpd-hpa_bak
+		fi
+		grep "$TFTP_PATH" /etc/default/tftpd-hpa > /dev/null 2>&1
+		if [ $? = "0" ]; then
+			echo -e "\033[0;32;1m[info] : The $TFTP_PATH has been configured!\e[0m"
+		else
+			cat /etc/default/tftpd-hpa | sed -e '3,$d' > $TFTP_PATH/tftpd-tmp     #删除第三到末尾的数据
+			sed -i '2a TFTP_USERNAME="tftp"'          $TFTP_PATH/tftpd-tmp
+			sed -i '$a TFTP_DIRECTORY="'$TFTP_PATH'"' $TFTP_PATH/tftpd-tmp
+			sed -i '$a TFTP_ADDRESS=":69"'            $TFTP_PATH/tftpd-tmp
+			sed -i '$a TFTP_OPTIONS="--secure"'       $TFTP_PATH/tftpd-tmp
+			sudo cp $TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa
+			rm $TFTP_PATH/tftpd-tmp
+		fi
+		ps -ef | grep "tftpd" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程
+		if [ $? = "0" ];then
+			echo -e "\033[0;32;1m[info] : restart tftp!\e[0m"
+			sudo service tftpd-hpa restart
+		else
+			echo -e "\033[0;32;1m[info] : start tftp!\e[0m"
+			sudo service tftpd-hpa start
+		fi
+	fi
+}
+
 function config_all(){
 	config_zsh
 	config_samba
@@ -216,6 +270,7 @@ function config_all(){
 	config_git
 	config_vim
 	config_nfs
+	config_tftp
 }
 
 
@@ -223,7 +278,7 @@ if [ $toolkit_index = "0" -o $toolkit_index = "1000" ]; then
 	echo -e "\e[0;33;1m     select toolkit name, default configure all\e[0m"
 	echo -e "\e[0;33;1m     toolkit name list - \e[0m"
 	echo -e "\e[0;33;1m       all | zsh | samba | ssh  | git  | vim\e[0m"
-	echo -e "\e[0;33;1m       nfs | \e[0m"
+	echo -e "\e[0;33;1m       nfs | tftp|\e[0m"
 	echo -e "\e[0;32;1m   choose:\e[0m \c"
 	read config_args
 else
@@ -238,5 +293,6 @@ case $config_args in
 	git)      config_git;;
 	vim)      config_vim;;
 	nfs)      config_nfs;;
+	tftp)     config_tftp;;
 	*)        echo -e "\e[0;32;1m[info] : invalid arguments\e[0m"
 esac
