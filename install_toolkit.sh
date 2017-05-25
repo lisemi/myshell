@@ -13,22 +13,56 @@ GIT_KEY=$USER_PATH/.ssh/id_rsa.pub
 NFS_PATH=$USER_PATH/nfs
 TFTP_PATH=$USER_PATH/tftpboot
 
-echo -e "\e[0;33;1m     exit| install | config\e[0m"
-echo -e "\e[0;33;1m     select toolkit name, default compile all\e[0m"
-echo -e "\e[0;33;1m     toolkit name list - \e[0m"
-echo -e "\e[0;33;1m       g++ | flex | gettext   | makeinfo  | automake  | build-essential\e[0m"
-echo -e "\e[0;33;1m       git | lzop | help2man  | odblatex  | autoconf  | python3.5-dev\e[0m"
-echo -e "\e[0;33;1m       m4  | zsh  | indent    | docbook2x | mtd-utils | openssh-server\e[0m"
-echo -e "\e[0;33;1m       bc  | vim  | autopoint | bison     | md5sum    | indicator-netspeed\e[0m"
-echo -e "\e[0;33;1m       nfs | scons| samba     | cmake     | compizconfig-settings-manager\e[0m"
-echo -e "\e[0;33;1m       dbus| tftp | d-feet    | libgtk2.0 | libncurses5-dev\e[0m"
-echo -e "\e[0;32;1m   choose:\e[0m \c"
-read compile_args
+function help_info()
+{
+	echo -e "\e[0;32;5m 帮助信息:                       \e[0m"
+	echo -e "\e[0;32;1m exit     退出                   \e[0m"
+	echo -e "\e[0;32;1m help     显示帮助               \e[0m"
+	echo -e "\e[0;32;1m install  安装所有包             \e[0m"
+	echo -e "\e[0;32;1m config   配置工具               \e[0m"
+	echo -e "\e[0;32;1m          选择对应的工具包名字，指定安装改工具包      \e[0m"
+    echo -e "\e[0;36;5m 部分工具说明:                                        \e[0m"
+	echo -e "\e[0;34;1m build-essential      供编译程序必须软件包的列表信息  \e[0m"
+	echo -e "\e[0;34;1m gettext              GNU国际化与本地化(i18n)函数库。它常被用于编写多语言程序    \e[0m"
+	echo -e "\e[0;34;1m help2man             自动生成man手册的工具:help2man  \e[0m"
+	echo -e "\e[0;34;1m indent               代码格式化                      \e[0m"
+	echo -e "\e[0;34;1m autopoint            是GNU gettext的一部分，用于将程序翻译成不同语言的一组工具  \e[0m"
+	echo -e "\e[0;34;1m makeinfo             将Texinfo源文档转换为各种其他格式                          \e[0m"
+	echo -e "\e[0;34;1m docbook2x            将DocBook文档转换成传统的Unix手册页格式和GNU Texinfo格式的软件包。 \e[0m"
+	echo -e "\e[0;34;1m bison                语法分析器生成器   \e[0m"
+	echo -e "\e[0;34;1m mtd-utils            linux工具包        \e[0m"
+	echo -e "\e[0;34;1m bc                   命令行计算器       \e[0m"
+	echo -e "\e[0;34;1m lzop                 解压缩             \e[0m"
+	echo -e "\e[0;34;1m indicator-netspeed   拼音输入法         \e[0m"
+	echo -e "\e[0;34;1m compizconfig         桌面显示工具:ctrl+D\e[0m"
+	echo -e "\e[0;34;1m d-feet               dbus信息查看工具: d-feet     \e[0m"
+	echo -e "\e[0;34;1m ncurses5             实现丰富多彩的字符颜色显示   \e[0m"
+	echo -e "\e[0;34;1m scons                一个Python写的自动化构建工具 \e[0m"
+	echo -e "\e[0;34;1m libldap2             LDAP协议      \e[0m"
+	echo -e "\e[0;34;1m libsasl2             单认证安全层  \e[0m"
+	echo -e "========================================================================"
+}
+
+function boot_menu()
+{
+	echo -e "\e[0;33;1m     exit | install | config           \e[0m"
+	echo -e "\e[0;33;1m     select toolkit name, default compile all \e[0m"
+	echo -e "\e[0;33;1m     toolkit name list -                      \e[0m"
+	echo -e "\e[0;33;1m       g++ | flex | gettext   | makeinfo  | automake  | build-essential    \e[0m"
+	echo -e "\e[0;33;1m       git | lzop | help2man  | odblatex  | autoconf  | python3.5-dev      \e[0m"
+	echo -e "\e[0;33;1m       m4  | zsh  | indent    | docbook2x | mtd-utils | openssh-server     \e[0m"
+	echo -e "\e[0;33;1m       bc  | vim  | autopoint | bison     | md5sum    | indicator-netspeed \e[0m"
+	echo -e "\e[0;33;1m       nfs | scons| samba     | cmake     | libsasl2  | compizconfig       \e[0m"
+	echo -e "\e[0;33;1m       dbus| tftp | d-feet    | libgtk2.0 | libldap2  | libncurses5-dev    \e[0m"
+	echo -e "\e[0;33;1m       libssl\e[0m"
+	echo -e "\e[0;32;1m   choose:\e[0m \c"
+	read compile_args
+}
 
 # install package
 package_name=(
 [1]=g++
-[2]=build-essential
+[2]=build-essential              #提供编译程序必须软件包的列表信息
 [3]=git
 [4]=gettext                      #GNU国际化与本地化(i18n)函数库。它常被用于编写多语言程序
 [5]=m4
@@ -37,7 +71,7 @@ package_name=(
 [8]=autopoint                    #是GNU gettext的一部分，用于将程序翻译成不同语言的一组工具
 [9]=makeinfo                     #将Texinfo源文档转换为各种其他格式
 [10]=odblatex
-[11]=docbook2x
+[11]=docbook2x                   #将DocBook文档转换成传统的Unix手册页格式和GNU Texinfo格式的软件包。
 [12]=flex
 [13]=bison
 [14]=automake
@@ -61,9 +95,15 @@ package_name=(
 [32]=scons
 [33]="nfs-kernel-server nfs-common"
 [34]="tftpd-hpa tftp-hpa"
+[35]=libldap2-dev                   #LDAP协议
+[36]=libsasl2-dev                   #简单认证安全层
+[37]=libssl-dev
 )
 
 trap - INT
+
+help_info
+boot_menu
 
 case $compile_args in
 	install)                    toolkit_index=0;;
@@ -90,7 +130,7 @@ case $compile_args in
 	cmake)						toolkit_index=21;;
 	openssh-server)				toolkit_index=22;;
 	indicator-netspeed)			toolkit_index=23;;
-	compizconfig-settings-manager) toolkit_index=24;;
+	compizconfig)               toolkit_index=24;;
 	samba)						toolkit_index=25;;
 	zsh)						toolkit_index=26;;
 	vim)						toolkit_index=27;;
@@ -101,11 +141,13 @@ case $compile_args in
 	scons)                      toolkit_index=32;;
 	nfs)                        toolkit_index=33;;
 	tftp)                       toolkit_index=34;;
+	ldap2)                      toolkit_index=35;;
+	sasl2)                      toolkit_index=36;;
+	ssl)                        toolkit_index=37;;
 	config)					    toolkit_index=1000;;
 	exit)                       exit 0;;
 	*)                          echo -e "\e[0;32;1m[info] : invalid arguments\e[0m"; exit 0;;
 esac
-
 
 function install_all(){
 	sudo apt-get update
@@ -193,13 +235,15 @@ function config_git(){
 		git config --global user.name "$GIT_NAME"
 		git config --global user.email "$GIT_EMAIL"
 	fi
+	cat $GIT_KEY
 }
 
 function config_vim(){
 	echo -e "\033[0;32;1m[info] : configure vim\e[0m"
 	if [ ! -d $USER_PATH/.vim/bundle/vundle ]; then
 		git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-		git@github.com:lisemi/vimrc.git $USER_PATH
+		git clone git@github.com:lisemi/vimrc.git $USER_PATH/vimrc
+		cp ~/.vimrc ~/.vimrc_bak
 		cp $USER_PATH/vimrc/vimrc ~/.vimrc
 		rm -r $USER_PATH/vimrc
 	fi
@@ -249,10 +293,10 @@ function config_tftp(){
 			sed -i '$a TFTP_DIRECTORY="'$TFTP_PATH'"' $TFTP_PATH/tftpd-tmp
 			sed -i '$a TFTP_ADDRESS=":69"'            $TFTP_PATH/tftpd-tmp
 			sed -i '$a TFTP_OPTIONS="--secure"'       $TFTP_PATH/tftpd-tmp
-			sudo cp $TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa
-			rm $TFTP_PATH/tftpd-tmp
+			sudo cp "$TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa"
+			rm "$TFTP_PATH/tftpd-tmp"
 		fi
-		ps -ef | grep "tftpd" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程
+		ps -ef | grep "tftpd" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程,可以使用pgrep替代ps和grep的组合
 		if [ $? = "0" ];then
 			echo -e "\033[0;32;1m[info] : restart tftp!\e[0m"
 			sudo service tftpd-hpa restart
@@ -273,19 +317,25 @@ function config_all(){
 	config_tftp
 }
 
+function config_menu()
+{
+	if [ $toolkit_index = "0" -o $toolkit_index = "1000" ]; then
+		echo -e "\e[0;33;1m     exit: exit use         \e[0m"
+		echo -e "\n"
+		echo -e "\e[0;33;1m     select toolkit name, default configure all\e[0m"
+		echo -e "\e[0;33;1m     toolkit name list - \e[0m"
+		echo -e "\e[0;33;1m       all | zsh | samba | ssh  | git  | vim\e[0m"
+		echo -e "\e[0;33;1m       nfs | tftp|\e[0m"
+		echo -e "\e[0;32;1m   choose:\e[0m \c"
+		read config_args
+	else
+		exit 0
+	fi
+}
 
-if [ $toolkit_index = "0" -o $toolkit_index = "1000" ]; then
-	echo -e "\e[0;33;1m     select toolkit name, default configure all\e[0m"
-	echo -e "\e[0;33;1m     toolkit name list - \e[0m"
-	echo -e "\e[0;33;1m       all | zsh | samba | ssh  | git  | vim\e[0m"
-	echo -e "\e[0;33;1m       nfs | tftp|\e[0m"
-	echo -e "\e[0;32;1m   choose:\e[0m \c"
-	read config_args
-else
-	exit 0
-fi
-
+config_menu
 case $config_args in
+	exit)     exit 0;;
 	all)      config_all;;
 	zsh)      config_zsh;;
 	samba)    config_samba;;
