@@ -40,6 +40,8 @@ function help_info()
 	echo -e "\e[0;34;1m scons                一个Python写的自动化构建工具 \e[0m"
 	echo -e "\e[0;34;1m libldap2             LDAP协议      \e[0m"
 	echo -e "\e[0;34;1m libsasl2             单认证安全层  \e[0m"
+	echo -e "\e[0;34;1m tk                   Tk是一个跨平台的图形工具包，它提供了Motif外观，并使用Tcl脚本语言来实现  \e[0m"
+	echo -e "\e[0;34;1m tcl                  工具命令语言,是一种脚本语言  \e[0m"
 	echo -e "========================================================================"
 }
 
@@ -54,7 +56,7 @@ function boot_menu()
 	echo -e "\e[0;33;1m       bc  | vim  | autopoint | bison     | md5sum    | indicator-netspeed \e[0m"
 	echo -e "\e[0;33;1m       nfs | scons| samba     | cmake     | libsasl2  | compizconfig       \e[0m"
 	echo -e "\e[0;33;1m       dbus| tftp | d-feet    | libgtk2.0 | libldap2  | libncurses5-dev    \e[0m"
-	echo -e "\e[0;33;1m       libssl\e[0m"
+	echo -e "\e[0;33;1m       tk  | tcl  | libssl\e[0m"
 	echo -e "\e[0;32;1m   choose:\e[0m \c"
 	read compile_args
 }
@@ -98,6 +100,8 @@ package_name=(
 [35]=libldap2-dev                   #LDAP协议
 [36]=libsasl2-dev                   #简单认证安全层
 [37]=libssl-dev
+[38]=tk8.4-dev
+[39]=tcl-8.4-dev
 )
 
 trap - INT
@@ -144,6 +148,8 @@ case $compile_args in
 	ldap2)                      toolkit_index=35;;
 	sasl2)                      toolkit_index=36;;
 	ssl)                        toolkit_index=37;;
+	tk)                         toolkit_index=38;;
+	tcl)                        toolkit_index=39;;
 	config)					    toolkit_index=1000;;
 	exit)                       exit 0;;
 	*)                          echo -e "\e[0;32;1m[info] : invalid arguments\e[0m"; exit 0;;
@@ -154,7 +160,7 @@ function install_all(){
 	for var in ${package_name[@]};
 	do
 		echo -e "\e[0;32;1m[info] : install $var\e[0m"
-		sudo apt-get -y --assume-yes install $var
+		sudo apt-get -y --assume-yes install "$var"
 	done
 }
 
@@ -164,7 +170,7 @@ if [ $toolkit_index = "0" ]; then
 elif [ $toolkit_index -gt 0 -a $toolkit_index -lt 100 ];then
 	tool=${package_name[$toolkit_index]}
 	echo -e "\e[0;32;1m[info] : install $tool\e[0m"
-	sudo apt-get -y --assume-yes install $tool
+	sudo apt-get -y --assume-yes install "$tool"         #不询问yes or no
 fi
 
 
@@ -182,10 +188,10 @@ function is_run(){
 
 function config_zsh(){
 	echo -e "\033[0;32;1m[info] : detection zsh\e[0m"
-	if [ ! -f $HOME/.zshrc ]; then
+	if [ ! -f "$HOME/.zshrc" ]; then
 		echo -e "\033[0;32;1m[info] : configure zsh\e[0m"
 		wget --no-check-certificate https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
-		sudo usermod -s /bin/zsh $USER
+		sudo usermod -s /bin/zsh "$USER"
 	fi
 }
 
@@ -229,23 +235,23 @@ function config_ssh(){
 
 function config_git(){
 	echo -e "\033[0;32;1m[info] : detaction git\e[0m"
-	if [ ! -f $GIT_KEY ]; then
+	if [ ! -f "$GIT_KEY" ]; then
 		echo -e "\033[0;32;1m[info] : configure git"
 		ssh-keygen -t rsa -C "$GIT_EMAIL"
 		git config --global user.name "$GIT_NAME"
 		git config --global user.email "$GIT_EMAIL"
 	fi
-	cat $GIT_KEY
+	cat "$GIT_KEY"
 }
 
 function config_vim(){
 	echo -e "\033[0;32;1m[info] : configure vim\e[0m"
-	if [ ! -d $USER_PATH/.vim/bundle/vundle ]; then
+	if [ ! -d "$USER_PATH/.vim/bundle/vundle" ]; then
 		git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-		git clone git@github.com:lisemi/vimrc.git $USER_PATH/vimrc
+		git clone git@github.com:lisemi/vimrc.git "$USER_PATH/vimrc"
 		cp ~/.vimrc ~/.vimrc_bak
-		cp $USER_PATH/vimrc/vimrc ~/.vimrc
-		rm -r $USER_PATH/vimrc
+		cp "$USER_PATH/vimrc/vimrc" ~/.vimrc
+		rm -r "$USER_PATH/vimrc"
 	fi
 }
 
@@ -254,7 +260,7 @@ function config_nfs(){
 	if [ -f /etc/exports ]; then
 		grep "$NFS_PATH" /etc/exports > /dev/null 2>&1
 		if [ $? != "0" ]; then
-			sudo sed -i '$a '$NFS_PATH' *(rw,sync,no_root_squash)' /etc/exports
+			sudo sed -i '$a '$NFS_PATH' *(rw,sync,no_root_squash)' /etc/exports  #最后一行插入内容
 			# “ *” 表示允许任何网段 IP 的系统访问该 NFS 目录
 			sudo /etc/init.d/nfs-kernel-server start
 			if [ $? != "0" ]; then
@@ -274,10 +280,10 @@ function config_nfs(){
 
 function config_tftp(){
 	echo -e "\033[0;32;1m[info] : configure tftp\e[0m"
-	if [ ! -d $TFTP_PATH ]; then
+	if [ ! -d "$TFTP_PATH" ]; then
 		echo -e "\033[0;32;1m[info] : create $TFTP_PATH\e[0m"
-		mkdir $TFTP_PATH
-		sudo chmod –R 777 $TFTP_PATH
+		mkdir "$TFTP_PATH"
+		sudo chmod –R 777 "$TFTP_PATH"
 	fi
 
 	if [ -f /etc/default/tftpd-hpa ]; then
@@ -288,11 +294,11 @@ function config_tftp(){
 		if [ $? = "0" ]; then
 			echo -e "\033[0;32;1m[info] : The $TFTP_PATH has been configured!\e[0m"
 		else
-			cat /etc/default/tftpd-hpa | sed -e '3,$d' > $TFTP_PATH/tftpd-tmp     #删除第三到末尾的数据
-			sed -i '2a TFTP_USERNAME="tftp"'          $TFTP_PATH/tftpd-tmp
-			sed -i '$a TFTP_DIRECTORY="'$TFTP_PATH'"' $TFTP_PATH/tftpd-tmp
-			sed -i '$a TFTP_ADDRESS=":69"'            $TFTP_PATH/tftpd-tmp
-			sed -i '$a TFTP_OPTIONS="--secure"'       $TFTP_PATH/tftpd-tmp
+			cat /etc/default/tftpd-hpa | sed -e '3,$d' > "$TFTP_PATH/tftpd-tmp"     #删除第三到末尾的数据
+			sed -i '2a TFTP_USERNAME="tftp"'          "$TFTP_PATH/tftpd-tmp"
+			sed -i '$a TFTP_DIRECTORY="'$TFTP_PATH'"' "$TFTP_PATH/tftpd-tmp"
+			sed -i '$a TFTP_ADDRESS=":69"'            "$TFTP_PATH/tftpd-tmp"
+			sed -i '$a TFTP_OPTIONS="--secure"'       "$TFTP_PATH/tftpd-tmp"
 			sudo cp "$TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa"
 			rm "$TFTP_PATH/tftpd-tmp"
 		fi
