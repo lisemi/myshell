@@ -6,27 +6,43 @@
 
 grm="rm -rf"
 
-g_host=arm-linux-gnueabihf
-g_compile=arm-linux-gnueabihf-
-g_cc=arm-linux-gnueabihf-gcc
-g_cxx=arm-linux-gnueabihf-g++
-g_ar=arm-linux-gnueabihf-ar
-g_ranlib=arm-linux-gnueabihf-ranlib
-g_ld=arm-linux-gnueabihf-ld
-g_nm=arm-linux-gnueabihf-nm
-#g_strip=arm-linux-gnueabihf-strip
+# toolchain_usr=/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/arm-linux-gnueabihf
+# g_host=arm-linux-gnueabihf
+# g_compile=arm-linux-gnueabihf-
+# g_cc=arm-linux-gnueabihf-gcc
+# g_cxx=arm-linux-gnueabihf-g++
+# g_ar=arm-linux-gnueabihf-ar
+# g_ranlib=arm-linux-gnueabihf-ranlib
+# g_ld=arm-linux-gnueabihf-ld
+# g_nm=arm-linux-gnueabihf-nm
+# g_strip=arm-linux-gnueabihf-strip
 
-#g_cc="arm-poky-linux-gnueabi-gcc -march=armv7-a -mthumb-interwork -mfloat-abi=hard -mfpu=neon -mtune=cortex-a9"   #poky 64位交叉编译工具
-toolchain_libpath=-L/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/arm-linux-gnueabihf/lib
-toolchain_includepath=-I/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/arm-linux-gnueabihf/include
+#====== A9
+toolchain_usr=/opt/poky/1.7/sysroots/cortexa9hf-vfp-neon-poky-linux-gnueabi/usr
+g_host=arm-poky-linux-gnueabi
+g_compile=arm-poky-linux-gnueabi-
+g_cc="arm-poky-linux-gnueabi-gcc"
+g_cxx="arm-poky-linux-gnueabi-g++9"
+g_ar=arm-poky-linux-gnueabi-ar
+g_ranlib=arm-poky-linux-gnueabi-ranlib
+g_strip=arm-poky-linux-gnueabi-strip
+g_ld=arm-poky-linux-gnueabi-ld
+g_as=arm-poky-linux-gnueabi-as
+g_target=arm-poky-linux-gnueabi
+CFLAGS="-march=armv7-a -mthumb-interwork -mfloat-abi=hard -mfpu=neon -mtune=cortex-a9"
+
+
+toolchain_libpath=-L$toolchain_usr/lib
+toolchain_includepath=-I$toolchain_usr/include
 
 root_path=$PWD
 source_packet_path=$root_path'/tar'      #源码目录
 root_release_path=$root_path'/release'   #编译输出目录
 root_build_path=$root_path'/build'       #编译目录
 source_md5_file=$root_path'/conf/md5.list'
-crosstool_path="`which arm-linux-gnueabihf-g++`"
 source_server_ip=`awk -F= '{print $2}' $root_path/conf/config.ini`
+#crosstool_path="`which arm-linux-gnueabihf-g++`"
+crosstool_path="`which arm-poky-linux-gnueabi-g++`"
 
 
 function help_info()
@@ -61,7 +77,7 @@ echo -e "\e[0;33;1m       flex | bison    | libmnl  | gmp   | libnftnl | readlin
 echo -e "\e[0;33;1m       sed  | binutils | nettool | bash  | coreutils| procps   | utillinux  \e[0m"
 echo -e "\e[0;33;1m       zlib | openssh  | ncurses | snmp  | findutils| wrappers | libgcrypt  \e[0m"
 echo -e "\e[0;33;1m       db   | openldap | krb5    | swig  | Python2.7| Python3.7| libcap-ng  \e[0m"
-echo -e "\e[0;33;1m       popt | logrotate \e[0m"
+echo -e "\e[0;33;1m       popt | logrotate| audit \e[0m"
 echo -e "\e[0;32;1m   choose:\e[0m \c"
 read compile_args
 
@@ -724,11 +740,13 @@ fi
 # 编译错误还没解决 
 if [ "$compile_args" = "" ] || [ "$compile_args" = "audit" ]
 then
-    get_valid_package "${module_name[36]} .tar.gz"
+    get_valid_package "${module_name[36]}.tar.gz"
      $grm "$root_build_path/${module_name[36]}"
-    tar xf "$source_packet_path'/'${module_name[36]}.tar.gz"
-    cd "$root_build_path'/'${module_name[36]}"
-	./configure prefix="$root_release_path" --sbindir="$root_release_path/sbin --with-python=yes --with-libwrap --enable-gssapi-krb5=yes --with-libcap-ng=yes --host=$g_host"
+    tar xf "$source_packet_path/${module_name[36]}.tar.gz"
+    cd "$root_build_path/${module_name[36]}"
+	./configure --with-python=yes --with-libwrap --enable-gssapi-krb5=yes --with-libcap-ng=yes \
+		prefix="$root_release_path" --sbindir="$root_release_path/sbin" \
+		--host=$g_host CC="$g_cc $CFLAGS"
     make -j6
     make install
 fi
