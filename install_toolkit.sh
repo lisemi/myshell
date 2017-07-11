@@ -56,7 +56,7 @@ function boot_menu()
 	echo -e "\e[0;33;1m       bc  | vim  | autopoint | bison     | md5sum    | indicator-netspeed \e[0m"
 	echo -e "\e[0;33;1m       nfs | scons| samba     | cmake     | libsasl2  | compizconfig       \e[0m"
 	echo -e "\e[0;33;1m       dbus| tftp | d-feet    | libgtk2.0 | libldap2  | libncurses5-dev    \e[0m"
-	echo -e "\e[0;33;1m       tk  | tcl  | libssl\e[0m"
+	echo -e "\e[0;33;1m       tk  | tcl  | libssl    | gawk \e[0m"
 	echo -e "\e[0;32;1m   choose:\e[0m \c"
 	read compile_args
 }
@@ -102,6 +102,7 @@ package_name=(
 [37]=libssl-dev
 [38]=tk8.4-dev
 [39]=tcl-8.4-dev
+[40]=gawk
 )
 
 trap - INT
@@ -170,7 +171,7 @@ if [ $toolkit_index = "0" ]; then
 elif [ $toolkit_index -gt 0 -a $toolkit_index -lt 100 ];then
 	tool=${package_name[$toolkit_index]}
 	echo -e "\e[0;32;1m[info] : install $tool\e[0m"
-	sudo apt-get -y --assume-yes install "$tool"         #不询问yes or no
+	sudo apt-get -y --assume-yes install $tool         #不询问yes or no
 fi
 
 
@@ -263,6 +264,7 @@ function config_nfs(){
 			sudo sed -i '$a '$NFS_PATH' *(rw,sync,no_root_squash)' /etc/exports  #最后一行插入内容
 			# “ *” 表示允许任何网段 IP 的系统访问该 NFS 目录
 			sudo /etc/init.d/nfs-kernel-server start
+			sudo exportfs -a  #起效export文件
 			if [ $? != "0" ]; then
 				echo -e "\033[0;32;1m[info] : nfs start fail; now restart!\e[0m"
 				sudo /etc/init.d/nfs-kernel-server restart
@@ -283,7 +285,7 @@ function config_tftp(){
 	if [ ! -d "$TFTP_PATH" ]; then
 		echo -e "\033[0;32;1m[info] : create $TFTP_PATH\e[0m"
 		mkdir "$TFTP_PATH"
-		sudo chmod –R 777 "$TFTP_PATH"
+		sudo chmod 777 "$TFTP_PATH" -R
 	fi
 
 	if [ -f /etc/default/tftpd-hpa ]; then
@@ -299,7 +301,7 @@ function config_tftp(){
 			sed -i '$a TFTP_DIRECTORY="'$TFTP_PATH'"' "$TFTP_PATH/tftpd-tmp"
 			sed -i '$a TFTP_ADDRESS=":69"'            "$TFTP_PATH/tftpd-tmp"
 			sed -i '$a TFTP_OPTIONS="--secure"'       "$TFTP_PATH/tftpd-tmp"
-			sudo cp "$TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa"
+			sudo cp $TFTP_PATH/tftpd-tmp /etc/default/tftpd-hpa
 			rm "$TFTP_PATH/tftpd-tmp"
 		fi
 		ps -ef | grep "tftpd" | grep -v "grep" > /dev/null 2>&1  #进程已经启动，则重启，否则启动进程,可以使用pgrep替代ps和grep的组合

@@ -25,3 +25,5 @@ ncurses-6.0.tar.gz            ee13d052e1ead260d7c28071f46eefb1
 tcp_wrappers_7.6.tar.gz       e6fa25f71226d090f34de3f6b122fb5a
 db-6.2.32.tar.gz              33491b4756cb44b91c3318b727e71023
 swig-3.0.12.tar.gz            82133dfa7bba75ff9ad98a7046be687c
+pip-1.5.4.tar.gz              834b2904f92d46aaa333267fb1c922bb
+logrotate-3.11.0.tar.gz       03cb3fea0a6c2e91affe5b02d6932ae5

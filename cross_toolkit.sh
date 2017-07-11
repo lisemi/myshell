@@ -49,6 +49,7 @@ function help_info()
 	echo -e "\e[0;32;1m net-tools      Linux的基础网络实用程序的集合,arp,hostname,ifconfig        \e[0m"
 	echo -e "\e[0;32;1m ncurses        实现丰富多彩的字符颜色显示         \e[0m"
 	echo -e "\e[0;32;1m wrappers       一个基于主机的网络访问控制表系统   \e[0m"
+	echo -e "\e[0;32;1m popt           命令行解析工具                     \e[0m"
 	echo -e "\e[0;31;1m===========================================================================\e[0m"
 }
 
@@ -60,6 +61,7 @@ echo -e "\e[0;33;1m       flex | bison    | libmnl  | gmp   | libnftnl | readlin
 echo -e "\e[0;33;1m       sed  | binutils | nettool | bash  | coreutils| procps   | utillinux  \e[0m"
 echo -e "\e[0;33;1m       zlib | openssh  | ncurses | snmp  | findutils| wrappers | libgcrypt  \e[0m"
 echo -e "\e[0;33;1m       db   | openldap | krb5    | swig  | Python2.7| Python3.7| libcap-ng  \e[0m"
+echo -e "\e[0;33;1m       popt | logrotate \e[0m"
 echo -e "\e[0;32;1m   choose:\e[0m \c"
 read compile_args
 
@@ -100,6 +102,9 @@ module_name=(
 [33]=Python-3.6.0
 [34]=krb5-1.14.5
 [35]=swig-3.0.12
+[36]=audit-2.7.6
+[37]=popt-1.16
+[38]=logrotate-3.11.0
 )
 
 # check crosstool exist
@@ -719,12 +724,48 @@ fi
 # 编译错误还没解决 
 if [ "$compile_args" = "" ] || [ "$compile_args" = "audit" ]
 then
-    get_valid_package "${module_name[31]} .tar.gz"
-     $grm "$root_build_path/${module_name[31]}"
-    tar xf "$source_packet_path'/'${module_name[31]}.tar.gz"
-    cd "$root_build_path'/'${module_name[31]}"
+    get_valid_package "${module_name[36]} .tar.gz"
+     $grm "$root_build_path/${module_name[36]}"
+    tar xf "$source_packet_path'/'${module_name[36]}.tar.gz"
+    cd "$root_build_path'/'${module_name[36]}"
 	./configure prefix="$root_release_path" --sbindir="$root_release_path/sbin --with-python=yes --with-libwrap --enable-gssapi-krb5=yes --with-libcap-ng=yes --host=$g_host"
     make -j6
     make install
 fi
+
+# compile popt
+# 说明：
+#     解析命令行选项.它不使用全局变量，因此可以并行解析argv；它可以解析任意的argv风格的元素数组，
+#     可以解析来自任何源文件的命令行字符串
+if [ "$compile_args" = "" ] || [ "$compile_args" = "popt" ]
+then
+    get_valid_package "${module_name[37]}.tar.gz"
+    $grm "$root_build_path/${module_name[37]}"
+    tar xf "$source_packet_path/${module_name[37]}.tar.gz"
+    cd "$root_build_path/${module_name[37]}"
+	./configure prefix="$root_release_path" --host="$g_host" CC=$g_cc \
+		--enable-shared=no --enable-static=yes
+    make -j6
+    make install
+fi
+
+# compile logrotate
+# 说明：
+#     解析命令行选项.它不使用全局变量，因此可以并行解析argv；它可以解析任意的argv风格的元素数组，
+#     可以解析来自任何源文件的命令行字符串
+if [ "$compile_args" = "" ] || [ "$compile_args" = "logrotate" ]
+then
+    get_valid_package "${module_name[38]}.tar.gz"
+    $grm "$root_build_path/${module_name[38]}"
+    tar xf "$source_packet_path/${module_name[38]}.tar.gz"
+    cd "$root_build_path/${module_name[38]}"
+	./configure prefix="$root_release_path" --host="$g_host" CC=$g_cc 
+    make -j6
+    make install
+fi
+
+
+
+
+
 
