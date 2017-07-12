@@ -77,7 +77,7 @@ echo -e "\e[0;33;1m       flex | bison    | libmnl  | gmp   | libnftnl | readlin
 echo -e "\e[0;33;1m       sed  | binutils | nettool | bash  | coreutils| procps   | utillinux  \e[0m"
 echo -e "\e[0;33;1m       zlib | openssh  | ncurses | snmp  | findutils| wrappers | libgcrypt  \e[0m"
 echo -e "\e[0;33;1m       db   | openldap | krb5    | swig  | Python2.7| Python3.7| libcap-ng  \e[0m"
-echo -e "\e[0;33;1m       popt | logrotate| audit \e[0m"
+echo -e "\e[0;33;1m       popt | logrotate| audit   | \e[0m"
 echo -e "\e[0;32;1m   choose:\e[0m \c"
 read compile_args
 
@@ -113,7 +113,7 @@ module_name=(
 [28]=tcp_wrappers_7.6
 [29]=Python-2.7.3
 [30]=libcap-ng-0.7
-[31]=db-6.2.32
+[31]=db-5.3.28
 [32]=openldap-2.4.44
 [33]=Python-3.6.0
 [34]=krb5-1.14.5
@@ -642,9 +642,11 @@ then
     $grm "$root_build_path/${module_name[31]}"
     tar xf "$source_packet_path/${module_name[31]}.tar.gz"
     cd "$root_build_path/${module_name[31]}/build_unix"
-	../dist/configure --prefix="$root_release_path" --enable-compat185 --enable-compat185 --disable-static --enable-cxx --host=$g_host
+	../dist/configure --enable-compat185 --enable-compat185 --disable-static --enable-cxx \
+		--prefix="$root_release_path" --host=$g_host \
+		CC="$g_cc $CFLAGS"
     make -j6
-    make docdir="$root_release_path/doc/db-6.2.32" install
+    make docdir="$root_release_path/doc/db-5.3.28" install
 	#chown -v -R root:root                        \
 	#   $root_release_path/bin/db_*                          \
 	#   $root_release_path/include/db{,_185,_cxx}.h          \
@@ -672,7 +674,7 @@ then
     cd "$root_build_path/${module_name[32]}"
 	sed -i '95a */' include/ac/string.h       #注释lutil_memcmp错误
 	sed -i '91a /*' include/ac/string.h
-	./configure --disable-ipv6 --with-yielding_select=yes --prefix="$root_release_path" --host=$g_host CC=$g_cc
+	./configure --disable-ipv6 --with-yielding_select=yes --prefix="$root_release_path" --host=$g_host CC="$g_cc $CFLAGS"
 	make depend
     make -j6
     make install
@@ -781,9 +783,6 @@ then
     make -j6
     make install
 fi
-
-
-
 
 
 
