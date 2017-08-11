@@ -205,7 +205,7 @@ then
 	# example.c是snmp的应用，可以选择替换和修改
     #cp new_example.c $root_build_path'/'${module_name[2]}'/'agent'/'mibgroup'/'examples'/'example.c
     cd "$root_build_path/${module_name[2]}"
-    CC=$g_cc ./configure --build=i686-linux \
+    CC="$g_cc $CFLAGS" ./configure --build=i686-linux \
         --host=arm-linux --disable-manuals --enable-mfd-rewrites \
         --with-default-snmp-version="2" \
         --with-sys-contact="contact" \
@@ -296,7 +296,7 @@ then
     cd "$root_build_path'/'${module_name[8]}"
     sed -i 's/#undef malloc//g' conf.in
     sed -i 's/#undef realloc//g' conf.in
-    ./configure --host=$g_host CC=$g_cc --with-gnu-ld \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --with-gnu-ld \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -309,7 +309,7 @@ then
     $grm "$root_build_path/${module_name[9]}"
     tar xf "$source_packet_path/${module_name[9]}.tar.gz"
     cd "$root_build_path/${module_name[9]}"
-    ./configure --host=$g_host CC=$g_cc --with-gnu-ld \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --with-gnu-ld \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -323,7 +323,7 @@ then
     $grm "$root_build_path/${module_name[10]}"
     tar xf "$source_packet_path/${module_name[10]}.tar.gz"
     cd "$root_build_path/${module_name[10]}"
-    ./configure --host=$g_host CC=$g_cc --with-gnu-ld \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --with-gnu-ld \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -336,7 +336,7 @@ then
     $grm "$root_build_path/${module_name[11]}"
     tar xf "$source_packet_path/${module_name[11]}.tar.bz2"
     cd "$root_build_path/${module_name[11]}"
-    ./configure --host=$g_host CC=$g_cc --with-gnu-ld \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --with-gnu-ld \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -352,7 +352,7 @@ then
     cd "$root_build_path'/'${module_name[12]}"
     export LIBMNL_CFLAGS="$toolchain_includepath/libmnl/"
     export LIBMNL_LIBS="$toolchain_libpath -lmnl"
-    ./configure --host=$g_host CC=$g_cc --with-gnu-ld \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --with-gnu-ld \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -366,7 +366,7 @@ then
     tar xf "$source_packet_path/${module_name[13]}.tar.gz"
     cd "$root_build_path/${module_name[13]}"
     sed -i '6324s/yes/no/g' configure
-    ./configure --host=$g_host CC=$g_cc \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -384,7 +384,7 @@ then
         LIBMNL_LIBS="$toolchain_libpath -lmnl" \
         LIBNFTNL_CFLAGS="$toolchain_includepath/libnftnl/" \
         LIBNFTNL_LIBS="$toolchain_libpath -lnftnl" \
-        ./configure --host=$g_host CC=$g_cc --without-cli \
+        ./configure --host=$g_host CC="$g_cc $CFLAGS" --without-cli \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -397,7 +397,7 @@ then
     $grm "$root_build_path/${module_name[15]}"
     tar xf "$source_packet_path/${module_name[15]}.tar.gz"
     cd "$root_build_path/${module_name[15]}"
-    ./configure --host=$g_host CC=$g_cc --without-cli \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --without-cli \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -410,7 +410,7 @@ then
     $grm "$root_build_path/${module_name[16]}"
     tar xf "$source_packet_path/${module_name[16]}.tar.xz"
     cd "$root_build_path/${module_name[16]}"
-    ./configure --host=$g_host CC=$g_cc --without-cli \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" --without-cli \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -425,7 +425,7 @@ then
     cd "$root_build_path/${module_name[17]}"
     NCURSES_CFLAGS="$toolchain_includepath/ncurses"  \
         NCURSES_LIBS="$toolchain_libpath -lncurses"  \
-        ./configure --host=$g_host CC=$g_cc \
+        ./configure --host=$g_host CC="$g_cc $CFLAGS" \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -444,7 +444,7 @@ then
     cd "$root_build_path/${module_name[18]}"
     NCURSES_CFLAGS="$toolchain_includepath"  \
         NCURSES_LIBS="$toolchain_libpath -lncurses"  \
-        ./configure --host=$g_host CC=$g_cc \
+        ./configure --host=$g_host CC="$g_cc $CFLAGS" \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -467,7 +467,7 @@ then
     $grm "$root_build_path/${module_name[20]}"
     tar xf "$source_packet_path/${module_name[20]}.tar.gz"
     cd "$root_build_path/${module_name[20]}"
-    ./configure --host=$g_host CC=$g_cc \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -480,7 +480,7 @@ then
     $grm "$root_build_path/${module_name[21]}"
     tar xf "$source_packet_path/${module_name[21]}.tar.gz"
     cd "$root_build_path/${module_name[21]}"
-    CC=$g_cc ./configure --prefix="$root_release_path"
+    CC="$g_cc $CFLAGS" ./configure --prefix="$root_release_path"
     make -j6
     make install
 fi
@@ -493,7 +493,7 @@ then
     tar xf "$source_packet_path/${module_name[22]}.tar.gz"
     cd "$root_build_path/${module_name[22]}"
     exprot prefix="$root_release_path"
-    ./configure --host=$g_host CC=$g_cc \
+    ./configure --host=$g_host CC="$g_cc $CFLAGS" \
         --prefix="$root_release_path"
     make -j6
     make install
@@ -520,7 +520,7 @@ then
     tar xf "$source_packet_path/${module_name[24]}.tar.gz"
     cd "$root_build_path/${module_name[24]}"
     export "$root_release_path"
-    CC=$g_cc  make
+    CC="$g_cc $CFLAGS"  make
     make
 fi
 
@@ -559,7 +559,7 @@ then
     cd "$root_build_path/${module_name[27]}"
     ./configure --host=$g_host --disable-clients --disable-ipv6 --disable-ncurses \
         --prefix="$root_release_path" \
-        CC=$g_cc
+        CC="$g_cc $CFLAGS"
     make -j6
     make install
     cp -a ping/ping ping/ping6 "$root_release_path/bin"
@@ -580,11 +580,14 @@ then
     #cp $source_packet_path/tcp_wrappers-7.6-shared_lib_plus_plus-1.patch ./
 	patch -Np1 -i tcp_wrappers-7.6-shared_lib_plus_plus-1.patch
 	sed -i -e "s,^extern char \*malloc();,/* & */," scaffold.c
-	make REAL_DAEMON_DIR="$root_release_path" STYLE=-DPROCESS_OPTIONS linux CC=$g_cc
-    make install
-	cp tcpd tcpdmatch tcpdchk try-from safe_finger "$root_release_path/sbin"
-	cp tcpd.h "$root_release_path/include"
-	cp shared/libwrap* "$root_release_path/lib"
+	sed -i 's#REAL_DAEMON_DIR=/usr/sbin#REAL_DAEMON_DIR='$root_release_path'#g' Makefile
+	export DESTDIR=$root_release_path
+
+	make REAL_DAEMON_DIR="$root_release_path" STYLE=-DPROCESS_OPTIONS linux CC="$g_cc $CFLAGS"
+	make install
+	cp -a tcpd tcpdmatch tcpdchk try-from safe_finger $root_release_path/sbin
+	cp -a tcpd.h "$root_release_path/include"
+	cp -a shared/libwrap* "$root_release_path/lib"
 fi
 
 # compile Python2.7.3
@@ -609,7 +612,7 @@ python_2_7_3_patch=$root_path/conf/Python-2.7.3-xcompile.patch
 	echo ac_cv_file__dev_ptmx=no > config.site
 	echo ac_cv_file__dev_ptc=no >> config.site
 	export CONFIG_SITE=config.site
-	./configure CC=$g_cc CXX=$g_cxx AR=$g_ar RANLIB=$g_ranlib LD=$g_ld NM=$g_nm --host=arm-linux-gnueabihf --build=x86_64-linux --disable-ipv6
+	./configure CC="$g_cc $CFLAGS" CXX=$g_cxx AR=$g_ar RANLIB=$g_ranlib LD=$g_ld NM=$g_nm --host=arm-linux-gnueabihf --build=x86_64-linux --disable-ipv6
     #4、编译安装
 	make HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="$g_cc -shared" CROSS_COMPILE=$g_compile CROSS_COMPILE_TARGET=yes HOSTARCH=g_host BUILDARCH=x86_64-linux
 	make install HOSTPYTHON=./hostpython BLDSHARED="$g_cc -shared" CROSS_COMPILE=$g_compile CROSS_COMPILE_TARGET=yes prefix="$root_release_path"
@@ -627,7 +630,7 @@ then
     $grm "$root_build_path/${module_name[30]}"
     tar xf "$source_packet_path/${module_name[30]}.tar.gz"
     cd "$root_build_path/${module_name[30]}"
-    ./configure --host=$g_host --prefix="$root_release_path" CC=$g_cc
+    ./configure --host=$g_host --prefix="$root_release_path" CC="$g_cc $CFLAGS"
     make -j6
     make install
 fi
@@ -688,7 +691,7 @@ then
     $grm "$root_build_path/${module_name[33]}"
     tar xf "$source_packet_path/${module_name[33]}.tar.gz"
     cd "$root_build_path/${module_name[33]}"
-    ./configure CC=$g_cc CXX=$g_cxx AR=$g_ar RANLIB=$g_ranlib LD=$g_ld NM=$g_nm --host=$g_host --build=armv7 --disable-ipv6 ac_cv_file__dev_ptmx="yes" ac_cv_file__dev_ptc="no" prefix="$root_release_path"
+    ./configure CC="$g_cc $CFLAGS" CXX=$g_cxx AR=$g_ar RANLIB=$g_ranlib LD=$g_ld NM=$g_nm --host=$g_host --build=armv7 --disable-ipv6 ac_cv_file__dev_ptmx="yes" ac_cv_file__dev_ptc="no" prefix="$root_release_path"
     make -j6
     make install
 fi
@@ -704,17 +707,19 @@ fi
 #     将 vfprintf改成 gnu_printf不管用，改成 fprintf就管用了
 if [ "$compile_args" = "" ] || [ "$compile_args" = "krb5" ]
 then
-    get_valid_package "${module_name[34]}.tar.xz"
+    get_valid_package "${module_name[34]}.tar.gz"
     $grm "$root_build_path/${module_name[34]}"
     tar xf "$source_packet_path/${module_name[34]}.tar.gz"
-    cd "$root_build_path/${module_name[34]}"
-	echo krb5_cv_attr_constructor_destructor=yes>linux-cache
-	echo ac_cv_func_regcomp=yes>linux-cache
-	echo ac_cv_printf_positional=yes>linux-cache
-	echo ac_cv_file__etc_environment=yes>linux-cache
-	echo ac_cv_file__etc_TIMEZONE=yes>linux-cache
-	echo ac_cv_lib_resolv_res_search=yes>linux-cache
-    ./configure CC="$g_cc" --host="$g_host" prefix="$root_release_path" --cache-file=linux-cache
+    cd "$root_build_path/${module_name[34]}/src"
+	cp $root_path/conf/k5-platform.h include
+	echo krb5_cv_attr_constructor_destructor=yes>>linux-cache
+	echo ac_cv_func_regcomp=yes>>linux-cache
+	echo ac_cv_printf_positional=yes>>linux-cache
+	echo ac_cv_file__etc_environment=yes>>linux-cache
+	echo ac_cv_file__etc_TIMEZONE=yes>>linux-cache
+	echo ac_cv_lib_resolv_res_search=yes>>linux-cache
+	echo krb5_cv_attr_constructor_destructor=yes>>linux-cache
+    ./configure CC="$g_cc $CFLAGS" --host="$g_host" prefix="$root_release_path" --cache-file=linux-cache
     make -j6
     make install
 fi
@@ -730,7 +735,7 @@ then
     $grm "$root_build_path/${module_name[35]}"
     tar xf "$source_packet_path/${module_name[35]}.tar.gz"
     cd "$root_build_path/${module_name[35]}"
-	./configure prefix="$root_release_path" --host="$g_host"
+	./configure prefix="$root_release_path" --host="$g_host" CC="$g_cc $CFLAGS"
     make -j6
     make install
 fi
@@ -739,14 +744,14 @@ fi
 # 依赖库：
 # libwrap-->tcp_wrappers 需要把编译出来的库和源码里tcpd.h文件拷到工具相对应目录才能配置通道
 # libcap-ng krb5 libldap python2 python3 swig
-# 编译错误还没解决 
+# --with-python=yes --with-libwrap --enable-gssapi-krb5=yes --with-libcap-ng=yes
 if [ "$compile_args" = "" ] || [ "$compile_args" = "audit" ]
 then
     get_valid_package "${module_name[36]}.tar.gz"
      $grm "$root_build_path/${module_name[36]}"
     tar xf "$source_packet_path/${module_name[36]}.tar.gz"
     cd "$root_build_path/${module_name[36]}"
-	./configure --with-python=yes --with-libwrap --enable-gssapi-krb5=yes --with-libcap-ng=yes \
+	./configure --enable-gssapi-krb5=yes --with-libwrap --with-libcap-ng=yes --enable-static \
 		prefix="$root_release_path" --sbindir="$root_release_path/sbin" \
 		--host=$g_host CC="$g_cc $CFLAGS"
     make -j6
@@ -763,7 +768,7 @@ then
     $grm "$root_build_path/${module_name[37]}"
     tar xf "$source_packet_path/${module_name[37]}.tar.gz"
     cd "$root_build_path/${module_name[37]}"
-	./configure prefix="$root_release_path" --host="$g_host" CC=$g_cc \
+	./configure prefix="$root_release_path" --host="$g_host" CC="$g_cc $CFLAGS" \
 		--enable-shared=no --enable-static=yes
     make -j6
     make install
@@ -779,7 +784,7 @@ then
     $grm "$root_build_path/${module_name[38]}"
     tar xf "$source_packet_path/${module_name[38]}.tar.gz"
     cd "$root_build_path/${module_name[38]}"
-	./configure prefix="$root_release_path" --host="$g_host" CC=$g_cc 
+	./configure prefix="$root_release_path" --host="$g_host" CC="$g_cc $CFLAGS"
     make -j6
     make install
 fi

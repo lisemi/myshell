@@ -10,7 +10,7 @@ USER_NAME=$USER
 GIT_NAME=sammy
 GIT_EMAIL=lisemi@163.com
 GIT_KEY=$USER_PATH/.ssh/id_rsa.pub
-NFS_PATH=$USER_PATH/nfs
+NFS_PATH=$USER_PATH/nfs/rootfs
 TFTP_PATH=$USER_PATH/tftpboot
 
 function help_info()
@@ -157,11 +157,11 @@ case $compile_args in
 esac
 
 function install_all(){
-	sudo apt-get update
+	sudo yum update
 	for var in ${package_name[@]};
 	do
 		echo -e "\e[0;32;1m[info] : install $var\e[0m"
-		sudo apt-get -y --assume-yes install "$var"
+		sudo yum install "$var"
 	done
 }
 
@@ -171,7 +171,7 @@ if [ $toolkit_index = "0" ]; then
 elif [ $toolkit_index -gt 0 -a $toolkit_index -lt 100 ];then
 	tool=${package_name[$toolkit_index]}
 	echo -e "\e[0;32;1m[info] : install $tool\e[0m"
-	sudo apt-get -y --assume-yes install $tool         #不询问yes or no
+	sudo yum install $tool         #不询问yes or no
 fi
 
 
