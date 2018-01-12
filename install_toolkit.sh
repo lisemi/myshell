@@ -156,12 +156,28 @@ case $compile_args in
 	*)                          echo -e "\e[0;32;1m[info] : invalid arguments\e[0m"; exit 0;;
 esac
 
+uname -a | grep ubuntu
+if [ $? != "0" ];then
+	system_name="centOS"
+else
+	system_name="ubuntu"
+fi
+echo "system name : $system_name"
+
 function install_all(){
-	sudo yum update
+	if [ $system_name = "centOS" ];then
+		sudo yum update
+	else
+		sudo apt-get update
+	fi
 	for var in ${package_name[@]};
 	do
 		echo -e "\e[0;32;1m[info] : install $var\e[0m"
-		sudo yum install "$var"
+		if [ $system_name = "entOS" ]; then
+			sudo yum install "$var"
+		else
+			sudo apt-get -y --force-yes install "$var"
+		fi
 	done
 }
 
@@ -171,7 +187,11 @@ if [ $toolkit_index = "0" ]; then
 elif [ $toolkit_index -gt 0 -a $toolkit_index -lt 100 ];then
 	tool=${package_name[$toolkit_index]}
 	echo -e "\e[0;32;1m[info] : install $tool\e[0m"
-	sudo yum install $tool         #不询问yes or no
+	if [ $system_name = "centOS" ]; then
+		sudo yum install $tool
+	else
+		sudo apt-get -y --force-yes install $tool         #-y --force-yes 不询问yes or no
+	fi
 fi
 
 
@@ -252,7 +272,7 @@ function config_vim(){
 		git clone git@github.com:lisemi/vimrc.git "$USER_PATH/vimrc"
 		cp ~/.vimrc ~/.vimrc_bak
 		cp "$USER_PATH/vimrc/vimrc" ~/.vimrc
-		rm -r "$USER_PATH/vimrc"
+		rm -rf "$USER_PATH/vimrc"
 	fi
 }
 
